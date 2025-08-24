@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Full-stack Stock Analyzer application for Render deployment",
   "scripts": {
-    "build": "cd frontend && npm install --include=dev && npm run build",
+    "build": "cd frontend && npm install --include=dev && npm run build && cd ../backend && pip install --prefer-binary --timeout 300 --no-cache-dir -r requirements.txt",
     "start": "cd backend && python app.py",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && python app.py",

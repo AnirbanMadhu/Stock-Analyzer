@@ -4,7 +4,7 @@
 
 ### Build Command (Copy this to Render)
 ```bash
-npm run build && cd backend && pip install --no-cache-dir -r requirements.txt
+npm run build
 ```
 
 ### Start Command (Copy this to Render)
