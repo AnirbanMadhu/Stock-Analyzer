@@ -4,7 +4,7 @@
 
 ### Build Command (Copy this to Render)
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs && cd frontend && npm ci --only=production && npm run build && cd ../backend && pip install --no-cache-dir -r requirements.txt
+npm run build && cd backend && pip install --no-cache-dir -r requirements.txt
 ```
 
 ### Start Command (Copy this to Render)
@@ -47,6 +47,8 @@ chmod +x build.sh
 start_prod.bat
 ```
 
+⚠️ **Note for Windows users:** The start_prod.bat script uses gunicorn which requires Unix-like systems. On Windows, use `python app.py` for local testing instead.
+
 ### Test Production Start (Linux/Mac)
 ```bash
 chmod +x start_production.sh
@@ -81,6 +83,21 @@ cd frontend && npm ci && npm run build
 # Test backend
 cd backend && pip install -r requirements.txt
 ```
+
+### Common Render Build Errors
+
+**Error: `sudo: command not found`**
+- **Solution:** Remove `sudo` and Node.js installation from build command
+- **Use:** `npm run build && cd backend && pip install --no-cache-dir -r requirements.txt`
+
+**Error: `Failed writing body`**
+- **Solution:** Render already has Node.js, don't try to install it
+- **Use the simplified build command above**
+
+**Error: `vite: not found`**
+- **Solution:** Need to install devDependencies for build tools
+- **Fixed:** Changed from `npm ci` to `npm install` in build script
+- **Root cause:** Vite is in devDependencies but `npm ci --only=production` excludes it
 
 ### App Won't Start
 ```bash

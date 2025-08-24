@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Full-stack Stock Analyzer application for Render deployment",
   "scripts": {
-    "build": "cd frontend && npm ci && npm run build",
+    "build": "cd frontend && npm install && npm run build",
     "start": "cd backend && python app.py",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && python app.py",
@@ -14,8 +14,9 @@
     "test": "echo 'No tests specified'",
     "clean": "rm -rf frontend/dist && rm -rf backend/__pycache__"
   },
-  "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "terser": "^5.43.1"
+  },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0",
