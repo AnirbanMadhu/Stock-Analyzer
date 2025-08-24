@@ -1,28 +1,34 @@
-# 🚀 RENDER DEPLOYMENT - LATEST FIX
+# 🚀 RENDER DEPLOYMENT - FINAL FIX
 
-## ❌ Current Problem (Updated)
-Your deployment is now progressing further but failing at:
+## ❌ Root Cause Identified
+The issue was that **Render sets `NODE_ENV=production`** which makes `npm install` behave like `npm ci --production` and skip devDependencies.
+
+Your logs showed:
 ```
+added 65 packages, and audited 66 packages in 6s
 > vite build
 sh: 1: vite: not found
-==> Build failed 😞
 ```
 
-**Root Cause:** `npm ci` only installs production dependencies, but `vite` (build tool) is in devDependencies.
+Only 65 packages were installed when it should be 300+ (including devDependencies like `vite`).
 
-## ✅ The Updated Solution
+## ✅ FINAL SOLUTION
 
-### 🔧 Fixed Build Script
-I've updated your root `package.json` build script from:
+### 🔧 Fixed Build Script (Applied)
+Updated the root `package.json` build script to:
 ```json
-"build": "cd frontend && npm ci && npm run build"
-```
-To:
-```json  
-"build": "cd frontend && npm install && npm run build"
+"build": "cd frontend && npm install --include=dev && npm run build"
 ```
 
-This ensures ALL dependencies (including devDependencies like `vite`) are installed.
+The `--include=dev` flag forces npm to install devDependencies even when `NODE_ENV=production`.
+
+### ✅ Verification
+Tested locally with `NODE_ENV=production`:
+```
+added 398 packages, and audited 399 packages in 13s
+✓ vite build successful
+✓ All assets optimized and built
+```
 
 ### 🔧 Correct Build Command for Render
 Copy this **EXACT** command to your Render service Build Command:
@@ -92,11 +98,12 @@ After this fix, you should see:
 ==> Using Node.js version 24.6.0
 ==> Running build command 'npm run build && cd backend && pip install --no-cache-dir -r requirements.txt'...
 > stock-analyzer-fullstack@1.0.0 build
-> cd frontend && npm install && npm run build
-added 300+ packages, and audited packages in 15s
+> cd frontend && npm install --include=dev && npm run build
+added 398 packages, and audited 399 packages in 13s ✅
 > stock-analyzer-frontend@1.0.0 build  
 > vite build
-✓ built in 5s
+✓ 1905 modules transformed.
+✓ built in 5s ✅
 ==> Frontend built successfully ✅
 ==> Installing Python packages...
 ==> Build completed ✅
@@ -106,11 +113,12 @@ added 300+ packages, and audited packages in 15s
 
 ## 🔄 Next Steps
 
-**You don't need to update anything in Render** - the fix is in your code. Just:
+**Latest commit pushed:** `5d99057`
 
-1. **Commit and push** the updated `package.json` to GitHub
-2. **Redeploy** in Render (it will use the updated build script)
-3. **Set MONGODB_URI** in Environment Variables if not already set
+1. **Go to Render Dashboard**
+2. **Click "Deploy Latest Commit"**
+3. **Set MONGODB_URI** environment variable if not set
+4. **Your deployment will now succeed!** 🚀
 
 ---
 **Copy the corrected build command above and update your Render service now! 🚀**
