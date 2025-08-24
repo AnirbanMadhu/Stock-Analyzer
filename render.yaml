@@ -1,0 +1,64 @@
+services:
+  # Full-stack application (React frontend + Flask backend with MongoDB)
+  - type: web
+    name: stock-analyzer-fullstack
+    runtime: python
+    buildCommand: |
+      # Install Node.js 18 (LTS)
+      curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+      sudo apt-get install -y nodejs
+      
+      # Verify installations
+      echo "=== Checking Versions ==="
+      node --version
+      npm --version
+      python --version
+      
+      # Clean any existing builds
+      echo "=== Cleaning Previous Builds ==="
+      rm -rf frontend/dist frontend/node_modules/.cache
+      
+      # Build frontend with production optimizations
+      echo "=== Building Frontend ==="
+      cd frontend
+      npm ci --only=production --silent
+      npm run build
+      echo "Frontend build completed ✓"
+      cd ..
+      
+      # Install backend dependencies with optimizations
+      echo "=== Installing Backend Dependencies ==="
+      cd backend
+      pip install --no-cache-dir --upgrade pip --quiet
+      pip install --no-cache-dir -r requirements.txt --quiet
+      echo "Backend dependencies installed ✓"
+      cd ..
+      
+      # Verify build outputs
+      echo "=== Build Verification ==="
+      ls -la frontend/dist/
+      echo "Frontend files found:"
+      find frontend/dist -type f -name "*.html" -o -name "*.js" -o -name "*.css" | head -5
+      
+      # Test Python app import
+      echo "=== Testing App Import ==="
+      cd backend && python -c "import app; print('Flask app imports successfully ✓')" && cd ..
+      
+      echo "=== Build Complete ==="
+    startCommand: cd backend && gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120 --worker-class gthread --max-requests 1000 --max-requests-jitter 100 --preload app:app
+    plan: free
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MONGODB_URI
+        value: # Add your MongoDB connection string here (e.g., mongodb+srv://user:pass@cluster.mongodb.net/stock_analyzer)
+      - key: MONGO_DB
+        value: stock_analyzer
+      - key: NODE_ENV
+        value: production
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+      - key: RENDER
+        value: "true"
