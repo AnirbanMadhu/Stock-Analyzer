@@ -14,11 +14,38 @@ try:
     from statsmodels.tsa.arima.model import ARIMA
     from statsmodels.tsa.seasonal import seasonal_decompose
     from statsmodels.tsa.stattools import adfuller
-    from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
     ARIMA_AVAILABLE = True
 except ImportError:
     ARIMA_AVAILABLE = False
     logging.warning("ARIMA model not available. Install statsmodels for ARIMA predictions.")
+
+# Scikit-learn imports with fallback
+try:
+    from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+    from sklearn.preprocessing import MinMaxScaler, StandardScaler
+    SKLEARN_AVAILABLE = True
+except ImportError:
+    SKLEARN_AVAILABLE = False
+    MinMaxScaler = None
+    StandardScaler = None
+    logging.warning("Scikit-learn not available. Using simple linear regression fallback.")
+    
+    # Simple fallback functions for metrics
+    def mean_absolute_error(y_true, y_pred):
+        """Fallback implementation of MAE"""
+        return np.mean(np.abs(np.array(y_true) - np.array(y_pred)))
+    
+    def mean_squared_error(y_true, y_pred):
+        """Fallback implementation of MSE"""
+        return np.mean((np.array(y_true) - np.array(y_pred)) ** 2)
+    
+    def r2_score(y_true, y_pred):
+        """Fallback implementation of R2 score"""
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+        ss_res = np.sum((y_true - y_pred) ** 2)
+        ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+        return 1 - (ss_res / ss_tot) if ss_tot != 0 else 0
 
 # TensorFlow imports with fallback for linting
 LSTM_AVAILABLE = False
@@ -762,6 +789,11 @@ class StockPredictor:
             feature_data = data[essential_features].dropna()
             if len(feature_data) < 150:  # Reduced minimum requirement
                 logger.warning(f"Insufficient clean data for LSTM: {len(feature_data)} points")
+                return None
+            
+            # Check if sklearn is available for scaling
+            if not SKLEARN_AVAILABLE or StandardScaler is None or MinMaxScaler is None:
+                logger.warning("Scikit-learn not available for feature scaling")
                 return None
             
             # Scale features

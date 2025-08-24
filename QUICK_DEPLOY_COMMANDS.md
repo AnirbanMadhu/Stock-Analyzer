@@ -7,6 +7,11 @@
 npm run build
 ```
 
+### Alternative Build Command (if needed)
+```bash
+cd frontend && npm install --include=dev && npm run build && cd ../backend && pip install --no-cache-dir --prefer-binary flask flask-cors flask-login flask-session pymongo flask-pymongo yfinance pandas numpy bcrypt python-dotenv requests beautifulsoup4 cryptography gunicorn
+```
+
 ### Start Command (Copy this to Render)
 ```bash
 cd backend && gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 app:app
