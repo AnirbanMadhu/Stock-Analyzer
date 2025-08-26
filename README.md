@@ -222,9 +222,6 @@ Stock-Analyzer/
 |-------|-------------|----------|----------|
 | **ARIMA** | Time series forecasting | Trend analysis | Good for stable stocks |
 | **LSTM** | Neural network | Complex patterns | High for volatile stocks |
-| **Hybrid** | Combined approach | Best of both | Balanced performance |
-| **Simple** | Moving averages | Quick predictions | Basic forecasting |
-| **Auto** | Smart selection | Convenience | Chooses optimal model |
 
 ## 🔧 Configuration
 
